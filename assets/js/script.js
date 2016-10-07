@@ -1,45 +1,92 @@
+function LightboxHandler (options) {
+  this.$lightbox = options.lightbox;
+  this.$image = options.image;
+  this.$title = options.title;
+  // this.$lightbox = document.getElementById('lightbox');
+  // this.$image = document.getElementById('lightbox-img');
+  // this.$title = this.$lightbox.getElementsByTagName('h3')[0];
+}
+
+LightboxHandler.prototype.show = function () {
+  this.$lightbox.classList.remove('hide-fully');
+}
+
+LightboxHandler.prototype.showNextPhoto = function (photosArray, currentPhotoIndex) {
+  console.log('hello', arguments)
+
+  if (currentPhotoIndex < photosArray.length - 1) {
+    currentPhotoIndex++;
+    this.render(photosArray, currentPhotoIndex);
+  }
+}
+
+LightboxHandler.prototype.showPreviousPhoto = function (photosArray, currentPhotoIndex) {
+  if (currentPhotoIndex < photosArray.length - 1) {
+    currentPhotoIndex++;
+    this.render(photosArray, currentPhotoIndex);
+  }
+}
+
+LightboxHandler.prototype.render = function(photosArray, currentPhotoIndex) {
+  var photo = photosArray[currentPhotoIndex];
+
+  this.$title.innerHTML = photo.title;
+  this.$image.src = photo.full_url;
+}
+
+
+
 function initializePage() {
   var photosArray = [],
     currentPhotoIndex = -1,
     $searchInput = null,
     $photoGrid = null,
-    lightbox = new Lightbox();
+    lightboxHandler;
 
   document.addEventListener('DOMContentLoaded', onDOMLoad);
 
-  function Lightbox() {
-    this.show = function () {
-      var $lightbox = document.getElementById('lightbox');
-      $lightbox.classList.remove('hide-fully');
-    }.bind(this);
+  // function LightboxHandler() {
+  //   this.$lightbox = document.getElementById('lightbox');
+  //   this.$image = document.getElementById('lightbox-img');
+  //   this.$title = this.$lightbox.getElementsByTagName('h3')[0];
 
-    this.showNextPhoto = function () {
-      if (currentPhotoIndex < photosArray.length - 1) {
-        currentPhotoIndex++;
-        this.render();
-      }
-    }.bind(this);
+  //   this.show = function () {
+  //     var $lightbox = document.getElementById('lightbox');
+  //     $lightbox.classList.remove('hide-fully');
+  //   }.bind(this);
 
-    this.showPreviousPhoto = function () {
-      if (currentPhotoIndex > 0) {
-        currentPhotoIndex--;
-        this.render();
-      }
-    }.bind(this);
+  //   this.showNextPhoto = function () {
+  //     if (currentPhotoIndex < photosArray.length - 1) {
+  //       currentPhotoIndex++;
+  //       this.render();
+  //     }
+  //   }.bind(this);
 
-    this.render = function () {
-      var $lightbox = document.getElementById('lightbox'),
-        $lightboxImg = document.getElementById('lightbox-img'),
-        $title = $lightbox.getElementsByTagName('h3')[0],
-        photo = photosArray[currentPhotoIndex];
+  //   this.showPreviousPhoto = function () {
+  //     if (currentPhotoIndex > 0) {
+  //       currentPhotoIndex--;
+  //       this.render();
+  //     }
+  //   }.bind(this);
 
-      $title.innerHTML = photo.title;
-      $lightboxImg.src = photo.full_url;
-    }.bind(this);
-  }
+  //   this.render = function () {
+  //     var photo = photosArray[currentPhotoIndex];
+
+  //     this.$title.innerHTML = photo.title;
+  //     this.$image.src = photo.full_url;
+  //   }.bind(this);
+  // }
 
   function onDOMLoad() {
-    var $searchButton = document.getElementById('search-btn');
+    var $searchButton = document.getElementById('search-btn'),
+      $lightbox = document.getElementById('lightbox');
+
+    lightboxHandler = new LightboxHandler({
+      lightbox: $lightbox,
+      image: document.getElementById('lightbox-img'),
+      title: $lightbox.getElementsByTagName('h3')[0]
+    });
+
     $searchInput = document.getElementById('search-input');
     $photoGrid = document.getElementById('photo-grid');
 
@@ -55,8 +102,16 @@ function initializePage() {
         $lightboxLeft = $lightbox.getElementsByClassName('left')[0],
         $lightboxRight = $lightbox.getElementsByClassName('right')[0];
 
-      $lightboxLeft.addEventListener('click', lightbox.showPreviousPhoto);
-      $lightboxRight.addEventListener('click', lightbox.showNextPhoto);
+      $lightboxLeft.addEventListener('click', lightboxHandler.showPreviousPhoto.bind(this, getPhotosArray(), getCurrentPhotoIndex()));
+      $lightboxRight.addEventListener('click', lightboxHandler.showNextPhoto.bind(this, getPhotosArray(), getCurrentPhotoIndex()));
+
+      function getPhotosArray() {
+        return photosArray;
+      }
+
+      function getCurrentPhotoIndex() {
+        return currentPhotoIndex
+      }
     }
   }
 
@@ -159,8 +214,8 @@ function initializePage() {
 
     currentPhotoIndex = photo.getAttribute('data-index');
 
-    lightbox.show();
-    lightbox.render();
+    lightboxHandler.show();
+    lightboxHandler.render(photosArray, currentPhotoIndex);
   }
 }
 
