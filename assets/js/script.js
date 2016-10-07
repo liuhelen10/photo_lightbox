@@ -1,15 +1,51 @@
+// Lightbox Handler -- handles all logic concerning the lightbox
 function LightboxHandler(lightbox) {
   this.$lightbox = lightbox;
   this.$image = this.$lightbox.getElementsByClassName('lightbox-img')[0];
   this.$title = this.$lightbox.getElementsByClassName('lightbox-title')[0];
-  this.$left = this.$lightbox.getElementsByClassName('left')[0];
-  this.$right = this.$lightbox.getElementsByClassName('right')[0];
-
   this.photosArray = [];
   this.currentPhotoIndex = -1;
+
+  this.setUpEventListeners();
 }
 
-LightboxHandler.prototype.setPhotoData = function (photosArray) {
+LightboxHandler.prototype.setUpEventListeners = function () {
+  var $leftNav = this.$lightbox.getElementsByClassName('left')[0],
+    $rightNav = this.$lightbox.getElementsByClassName('right')[0];
+
+  $leftNav.addEventListener('click', this.showPreviousPhoto);
+  $rightNav.addEventListener('click', this.showNextPhoto)
+
+  document.addEventListener('keydown', triggerKeyDownAction.bind(this));
+  document.addEventListener('click', triggerClose.bind(this));
+
+  function triggerKeyDownAction(e) {
+    if (e.keyCode === 27) {
+      // Escape key
+      this.close();
+    } else {
+      if (!this.$lightbox.classList.contains('hide-fully')) {
+        if (e.keyCode === 39) {
+          // Right arrow
+          this.showNextPhoto();
+        } else if (e.keyCode === 37) {
+          // Left arrow
+          this.showPreviousPhoto();
+        }
+      }
+    }
+  }
+
+  function triggerClose(e) {
+    var isKeydown = e.type === 'keydown';
+    var escapeKeyPressed = isKeydown && e.keyCode === 27;
+    var outsideOfLightboxClicked = e.type === 'click' && e.target.getElementsByClassName('modal').length;
+
+    if (escapeKeyPressed || outsideOfLightboxClicked) this.close();
+  }
+}
+
+LightboxHandler.prototype.setPhotosArray = function (photosArray) {
   this.photosArray = photosArray;
 }
 
@@ -51,6 +87,7 @@ LightboxHandler.prototype.showNextPhoto = function() {
 
 
 
+// Page logic
 function initializePage() {
   var $searchInput = null,
     $photoGrid = null,
@@ -70,44 +107,15 @@ function initializePage() {
 
     $searchButton.addEventListener('click', searchForPhotos);
     $searchInput.addEventListener('keydown', onSearchInputKeyDown);
-    lightboxHandler.$left.addEventListener('click', lightboxHandler.showPreviousPhoto);
-    lightboxHandler.$right.addEventListener('click', lightboxHandler.showNextPhoto)
-    document.addEventListener('keydown', triggerLightboxKeydownAction);
-    document.addEventListener('click', triggerCloseLightbox);
   }
 
   function onSearchInputKeyDown(e) {
     if (!e) return;
 
     if (e.keyCode === 13) {
-      // Enter is pressed
+      // Enter key
       searchForPhotos();
     }
-  }
-
-  function triggerLightboxKeydownAction(e) {
-    if (e.keyCode === 27) {
-      // Escape key
-      lightboxHandler.close();
-    } else {
-      if (!document.getElementById('lightbox').classList.contains('hide-fully')) {
-        if (e.keyCode === 39) {
-          // Right arrow
-          lightboxHandler.showNextPhoto();
-        } else if (e.keyCode === 37) {
-          // Left arrow
-          lightboxHandler.showPreviousPhoto();
-        }
-      }
-    }
-  }
-
-  function triggerCloseLightbox(e) {
-    var isKeydown = e.type === 'keydown';
-    var escapeKeyPressed = isKeydown && e.keyCode === 27;
-    var outsideOfLightboxClicked = e.type === 'click' && e.target.getElementsByClassName('modal').length;
-
-    if (escapeKeyPressed || outsideOfLightboxClicked) lightboxHandler.close();
   }
 
   function searchForPhotos() {
@@ -137,13 +145,13 @@ function initializePage() {
     }
 
     photosArray = getFormattedPhotosResponse(response.photos.photo);
-    lightboxHandler.setPhotoData(photosArray);
+    lightboxHandler.setPhotosArray(photosArray);
 
     for (var i = 0; i < photosArray.length; i++) {
       appendPhotoToGrid(photosArray[i]);
     }
 
-    /* Photo response handlers */
+    // Photo response handlers
     function getFormattedPhotosResponse(photos) {
       var photosResponse = [];
 
@@ -194,11 +202,11 @@ function initializePage() {
     $image.addEventListener('click', openLightbox)
 
     $photoGrid.appendChild($image);
-  }
 
-  function openLightbox(e) {
-    var photo = e.target;
-    lightboxHandler.open(photo.getAttribute('data-index'));
+    function openLightbox(e) {
+      var photo = e.target;
+      lightboxHandler.open(photo.getAttribute('data-index'));
+    }
   }
 }
 
