@@ -3,15 +3,26 @@ function initializePage() {
     currentPhotoIndex = -1,
     $searchInput = null,
     $photoGrid = null,
-    lightbox = new Lightbox();
+    lightboxHandler = new LightboxHandler();
 
   document.addEventListener('DOMContentLoaded', onDOMLoad);
 
-  function Lightbox() {
+  function LightboxHandler() {
     this.show = function () {
       var $lightbox = document.getElementById('lightbox');
       $lightbox.classList.remove('hide-fully');
     }.bind(this);
+
+    this.close = function () {
+      var $lightbox = document.getElementById('lightbox'),
+        $lightboxImg = document.getElementById('lightbox-img'),
+        $title = $lightbox.getElementsByTagName('h3')[0];
+
+      currentPhotoIndex = -1;
+      $lightbox.classList.add('hide-fully');
+      $lightboxImg.src = '';
+      $title.innerHTML = '';
+    }
 
     this.showNextPhoto = function () {
       if (currentPhotoIndex < photosArray.length - 1) {
@@ -41,23 +52,18 @@ function initializePage() {
   function onDOMLoad() {
     var $searchButton = document.getElementById('search-btn');
     $searchInput = document.getElementById('search-input');
-    $photoGrid = document.getElementById('photo-grid');
+    $photoGrid = document.getElementById('photo-grid'),
+    $lightbox = document.getElementById('lightbox'),
+    $lightboxLeft = $lightbox.getElementsByClassName('left')[0],
+    $lightboxRight = $lightbox.getElementsByClassName('right')[0];
 
     $searchInput.focus();
 
     $searchButton.addEventListener('click', searchForPhotos);
     $searchInput.addEventListener('keydown', onSearchInputKeyDown);
-
-    attachLightboxListeners();
-
-    function attachLightboxListeners() {
-      var $lightbox = document.getElementById('lightbox'),
-        $lightboxLeft = $lightbox.getElementsByClassName('left')[0],
-        $lightboxRight = $lightbox.getElementsByClassName('right')[0];
-
-      $lightboxLeft.addEventListener('click', lightbox.showPreviousPhoto);
-      $lightboxRight.addEventListener('click', lightbox.showNextPhoto);
-    }
+    $lightboxLeft.addEventListener('click', lightboxHandler.showPreviousPhoto);
+    $lightboxRight.addEventListener('click', lightboxHandler.showNextPhoto);
+    document.addEventListener('keydown', triggerLightboxKeydownAction);
   }
 
   function onSearchInputKeyDown(e) {
@@ -66,6 +72,23 @@ function initializePage() {
     if (e.keyCode === 13) {
       // Enter is pressed
       searchForPhotos();
+    }
+  }
+
+  function triggerLightboxKeydownAction(e) {
+    if (e.keyCode === 27) {
+      // Escape key
+      lightboxHandler.close();
+    } else {
+      if (!document.getElementById('lightbox').classList.contains('hide-fully')) {
+        if (e.keyCode === 39) {
+          // Right arrow
+          lightboxHandler.showNextPhoto();
+        } else if (e.keyCode === 37) {
+          // Left arrow
+          lightboxHandler.showPreviousPhoto();
+        }
+      }
     }
   }
 
@@ -155,12 +178,11 @@ function initializePage() {
 
   function openLightbox(e) {
     var photo = e.target;
-    var $lightbox = document.getElementById('lightbox');
 
     currentPhotoIndex = photo.getAttribute('data-index');
 
-    lightbox.show();
-    lightbox.render();
+    lightboxHandler.show();
+    lightboxHandler.render();
   }
 }
 
