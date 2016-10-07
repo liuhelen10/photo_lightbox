@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <link rel="stylesheet" type="text/css" href="assets/css/positioning.css" />
+    <link rel="stylesheet" type="text/css" href="assets/css/styleguide.css" />
     <link rel="stylesheet" type="text/css" href="assets/css/styles.css" />
     <script src="assets/js/script.js"></script>
   </head>
 
   <body>
-    <div class="content phl pvm">
+    <div class="phl pvm">
       <div class="search-bar pvm">
         <h1>Flickr Image Search</h1>
         <input type="text" class="btn-or-input" id="search-input" placeholder="Search term"></input>
@@ -15,5 +15,25 @@
       </div>
 
       <div id="photo-grid"></div>
+
+    <div id="lightbox" class="hide-fully">
+      <div class="background"></div>
+      <div class="content">
+        <div class="modal">
+          <div class="modal-content pbl">
+            <div class="left clickable">
+              <img src="assets/symbols/left_chevron.png" class="clickable chevron chevron-left" height="30px" />
+            </div>
+            <div class="middle">
+              <h3></h3>
+              <img src="" id="lightbox-img" />
+            </div>
+            <div class="right clickable">
+              <img src="assets/symbols/right_chevron.png" class="clickable chevron chevron-right" height="30px" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </body>
 </html>
