@@ -64,6 +64,7 @@ function initializePage() {
     $lightboxLeft.addEventListener('click', lightboxHandler.showPreviousPhoto);
     $lightboxRight.addEventListener('click', lightboxHandler.showNextPhoto);
     document.addEventListener('keydown', triggerLightboxKeydownAction);
+    document.addEventListener('click', triggerCloseLightbox);
   }
 
   function onSearchInputKeyDown(e) {
@@ -90,6 +91,14 @@ function initializePage() {
         }
       }
     }
+  }
+
+  function triggerCloseLightbox(e) {
+    var isKeydown = e.type === 'keydown';
+    var escapeKeyPressed = isKeydown && e.keyCode === 27;
+    var outsideOfLightboxClicked = e.type === 'click' && e.target.getElementsByClassName('modal').length;
+
+    if (escapeKeyPressed || outsideOfLightboxClicked) lightboxHandler.close();
   }
 
   function searchForPhotos() {
