@@ -1,68 +1,77 @@
+function LightboxHandler(lightbox) {
+  this.$lightbox = lightbox;
+  this.$image = this.$lightbox.getElementsByClassName('lightbox-img')[0];
+  this.$title = this.$lightbox.getElementsByClassName('lightbox-title')[0];
+  this.$left = this.$lightbox.getElementsByClassName('left')[0];
+  this.$right = this.$lightbox.getElementsByClassName('right')[0];
+
+  this.photosArray = [];
+  this.currentPhotoIndex = -1;
+}
+
+LightboxHandler.prototype.setPhotoData = function (photosArray) {
+  this.photosArray = photosArray;
+}
+
+LightboxHandler.prototype.setCurrentPhotoIndex = function (currentPhotoIndex) {
+  this.currentPhotoIndex = currentPhotoIndex;
+}
+
+LightboxHandler.prototype.open = function (currentPhotoIndex) {
+  this.$lightbox.classList.remove('hide-fully');
+  this.currentPhotoIndex = currentPhotoIndex;
+  this.render();
+}
+
+LightboxHandler.prototype.close = function () {
+  this.$lightbox.classList.add('hide-fully');
+  this.$image.src = '';
+  this.$title.innerHTML = '';
+}
+
+LightboxHandler.prototype.render = function () {
+  var photo = this.photosArray[this.currentPhotoIndex];
+  this.$title.innerHTML = photo.title;
+  this.$image.src = photo.full_url;
+}
+
+LightboxHandler.prototype.showPreviousPhoto = function() {
+  if (this.currentPhotoIndex > 0) {
+    this.currentPhotoIndex--;
+    this.render(this.photosArray[this.currentPhotoIndex]);
+  }
+}
+
+LightboxHandler.prototype.showNextPhoto = function() {
+  if (this.currentPhotoIndex < this.photosArray.length - 1) {
+    this.currentPhotoIndex++;
+    this.render(this.photosArray[this.currentPhotoIndex]);
+  }
+}
+
+
+
 function initializePage() {
-  var photosArray = [],
-    currentPhotoIndex = -1,
-    $searchInput = null,
+  var $searchInput = null,
     $photoGrid = null,
-    lightboxHandler = new LightboxHandler();
+    lightboxHandler;
 
   document.addEventListener('DOMContentLoaded', onDOMLoad);
 
-  function LightboxHandler() {
-    this.show = function () {
-      var $lightbox = document.getElementById('lightbox');
-      $lightbox.classList.remove('hide-fully');
-    }.bind(this);
-
-    this.close = function () {
-      var $lightbox = document.getElementById('lightbox'),
-        $lightboxImg = document.getElementById('lightbox-img'),
-        $title = $lightbox.getElementsByTagName('h3')[0];
-
-      currentPhotoIndex = -1;
-      $lightbox.classList.add('hide-fully');
-      $lightboxImg.src = '';
-      $title.innerHTML = '';
-    }
-
-    this.showNextPhoto = function () {
-      if (currentPhotoIndex < photosArray.length - 1) {
-        currentPhotoIndex++;
-        this.render();
-      }
-    }.bind(this);
-
-    this.showPreviousPhoto = function () {
-      if (currentPhotoIndex > 0) {
-        currentPhotoIndex--;
-        this.render();
-      }
-    }.bind(this);
-
-    this.render = function () {
-      var $lightbox = document.getElementById('lightbox'),
-        $lightboxImg = document.getElementById('lightbox-img'),
-        $title = $lightbox.getElementsByTagName('h3')[0],
-        photo = photosArray[currentPhotoIndex];
-
-      $title.innerHTML = photo.title;
-      $lightboxImg.src = photo.full_url;
-    }.bind(this);
-  }
-
   function onDOMLoad() {
     var $searchButton = document.getElementById('search-btn');
+
+    // Globals
+    lightboxHandler = new LightboxHandler(document.getElementById('lightbox'));
     $searchInput = document.getElementById('search-input');
-    $photoGrid = document.getElementById('photo-grid'),
-    $lightbox = document.getElementById('lightbox'),
-    $lightboxLeft = $lightbox.getElementsByClassName('left')[0],
-    $lightboxRight = $lightbox.getElementsByClassName('right')[0];
+    $photoGrid = document.getElementById('photo-grid');
 
     $searchInput.focus();
 
     $searchButton.addEventListener('click', searchForPhotos);
     $searchInput.addEventListener('keydown', onSearchInputKeyDown);
-    $lightboxLeft.addEventListener('click', lightboxHandler.showPreviousPhoto);
-    $lightboxRight.addEventListener('click', lightboxHandler.showNextPhoto);
+    lightboxHandler.$left.addEventListener('click', lightboxHandler.showPreviousPhoto);
+    lightboxHandler.$right.addEventListener('click', lightboxHandler.showNextPhoto)
     document.addEventListener('keydown', triggerLightboxKeydownAction);
     document.addEventListener('click', triggerCloseLightbox);
   }
@@ -119,7 +128,8 @@ function initializePage() {
   }
 
   function onSearchResultsLoaded(e) {
-    var response = JSON.parse(e.target.response);
+    var response = JSON.parse(e.target.response),
+      photosArray;
 
     if (response.stat !== 'ok') {
       // Handle error
@@ -127,6 +137,7 @@ function initializePage() {
     }
 
     photosArray = getFormattedPhotosResponse(response.photos.photo);
+    lightboxHandler.setPhotoData(photosArray);
 
     for (var i = 0; i < photosArray.length; i++) {
       appendPhotoToGrid(photosArray[i]);
@@ -187,11 +198,7 @@ function initializePage() {
 
   function openLightbox(e) {
     var photo = e.target;
-
-    currentPhotoIndex = photo.getAttribute('data-index');
-
-    lightboxHandler.show();
-    lightboxHandler.render();
+    lightboxHandler.open(photo.getAttribute('data-index'));
   }
 }
 
