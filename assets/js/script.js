@@ -1,8 +1,42 @@
 function initializePage() {
-  var $searchInput = null,
-    $photoGrid = null;
+  var photosArray = [],
+    currentPhotoIndex = -1,
+    $searchInput = null,
+    $photoGrid = null,
+    lightbox = new Lightbox();
 
   document.addEventListener('DOMContentLoaded', onDOMLoad);
+
+  function Lightbox() {
+    this.show = function () {
+      var $lightbox = document.getElementById('lightbox');
+      $lightbox.classList.remove('hide-fully');
+    }.bind(this);
+
+    this.showNextPhoto = function () {
+      if (currentPhotoIndex < photosArray.length - 1) {
+        currentPhotoIndex++;
+        this.render();
+      }
+    }.bind(this);
+
+    this.showPreviousPhoto = function () {
+      if (currentPhotoIndex > 0) {
+        currentPhotoIndex--;
+        this.render();
+      }
+    }.bind(this);
+
+    this.render = function () {
+      var $lightbox = document.getElementById('lightbox'),
+        $lightboxImg = document.getElementById('lightbox-img'),
+        $title = $lightbox.getElementsByTagName('h3')[0],
+        photo = photosArray[currentPhotoIndex];
+
+      $title.innerHTML = photo.title;
+      $lightboxImg.src = photo.full_url;
+    }.bind(this);
+  }
 
   function onDOMLoad() {
     var $searchButton = document.getElementById('search-btn');
@@ -13,6 +47,17 @@ function initializePage() {
 
     $searchButton.addEventListener('click', searchForPhotos);
     $searchInput.addEventListener('keydown', onSearchInputKeyDown);
+
+    attachLightboxListeners();
+
+    function attachLightboxListeners() {
+      var $lightbox = document.getElementById('lightbox'),
+        $lightboxLeft = $lightbox.getElementsByClassName('left')[0],
+        $lightboxRight = $lightbox.getElementsByClassName('right')[0];
+
+      $lightboxLeft.addEventListener('click', lightbox.showPreviousPhoto);
+      $lightboxRight.addEventListener('click', lightbox.showNextPhoto);
+    }
   }
 
   function onSearchInputKeyDown(e) {
@@ -26,7 +71,7 @@ function initializePage() {
 
   function searchForPhotos() {
     // Clear photo grid
-    document.getElementById('photo-grid').innerHTML = '';
+    $photoGrid.innerHTML = '';
 
     var apiKey = '2a2a42163497badb56857f270528dd43',
         xhttp = new XMLHttpRequest(),
@@ -42,18 +87,17 @@ function initializePage() {
   }
 
   function onSearchResultsLoaded(e) {
-    var response = JSON.parse(e.target.response),
-      photos;
+    var response = JSON.parse(e.target.response);
 
     if (response.stat !== 'ok') {
       // Handle error
       return;
     }
 
-    photos = getFormattedPhotosResponse(response.photos.photo);
+    photosArray = getFormattedPhotosResponse(response.photos.photo);
 
-    for (var i = 0; i < photos.length; i++) {
-      appendPhotoToGrid(photos[i]);
+    for (var i = 0; i < photosArray.length; i++) {
+      appendPhotoToGrid(photosArray[i]);
     }
 
     /* Photo response handlers */
@@ -104,7 +148,19 @@ function initializePage() {
     $image.setAttribute('data-index', photo.index);
     $image.setAttribute('data-title', photo.title);
 
+    $image.addEventListener('click', openLightbox)
+
     $photoGrid.appendChild($image);
+  }
+
+  function openLightbox(e) {
+    var photo = e.target;
+    var $lightbox = document.getElementById('lightbox');
+
+    currentPhotoIndex = photo.getAttribute('data-index');
+
+    lightbox.show();
+    lightbox.render();
   }
 }
 
