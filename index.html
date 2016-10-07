@@ -1,19 +1,19 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <link rel="stylesheet" type="text/css" href="assets/css/positioning.css" />
     <link rel="stylesheet" type="text/css" href="assets/css/styles.css" />
     <script src="assets/js/script.js"></script>
   </head>
 
   <body>
-    <div class="content">
-      <div class="search-bar">
+    <div class="content phl pvm">
+      <div class="search-bar pvm">
         <h1>Flickr Image Search</h1>
-        <input type="text" id="search-term" placeholder="Search term"></input>
-        <button id="search">Search</button>
+        <input type="text" class="btn-or-input" id="search-input" placeholder="Search term"></input>
+        <button class="btn-or-input" id="search-btn">Search</button>
       </div>
 
-      <div id="photo-grid">
-      </div>
+      <div id="photo-grid"></div>
   </body>
 </html>
