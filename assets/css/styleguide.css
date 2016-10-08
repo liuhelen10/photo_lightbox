@@ -13,14 +13,18 @@
   padding-bottom: 50px;
 }
 
+@media (max-width : 480px) {
+  .xs-pas {
+    padding: 15px 15px 15px 15px;
+  }
+}
+
+
+
 /* Display */
 .hide-fully {
   display: none;
   visibility: hidden;
-}
-
-.display-inline-block {
-  display: inline-block;
 }
 
 
@@ -37,4 +41,10 @@
 
 .clickable:hover {
   cursor: pointer;
+}
+
+
+
+.type-italic {
+  font-style: italic;
 }

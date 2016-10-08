@@ -7,7 +7,7 @@
   </head>
 
   <body>
-    <div class="phl pvm">
+    <div class="phl pvm xs-pas">
       <div class="search-bar pvm">
         <h1>Flickr Image Search</h1>
         <input type="text" class="btn-or-input" id="search-input" placeholder="Search term"></input>
@@ -18,18 +18,23 @@
 
     <div id="lightbox" class="hide-fully">
       <div class="background"></div>
+      <!-- <div class="exit"> -->
+      <img src="assets/symbols/exit.png" class="exit clickable"/>
+      <!-- </div> -->
       <div class="content">
         <div class="modal">
+          <div class="header">
+            <h3 class="lightbox-title"></h3>
+          </div>
           <div class="modal-content pbl">
             <div class="left clickable">
-              <img src="assets/symbols/left_chevron.png" class="clickable chevron chevron-left" height="30px" />
+              <img src="assets/symbols/white_chevron_left.png" class="clickable chevron chevron-left" />
             </div>
             <div class="middle">
-              <h3></h3>
-              <img src="" id="lightbox-img" />
+              <img src="" class="lightbox-img" alt="" />
             </div>
             <div class="right clickable">
-              <img src="assets/symbols/right_chevron.png" class="clickable chevron chevron-right" height="30px" />
+              <img src="assets/symbols/white_chevron_right.png" class="clickable chevron chevron-right" />
             </div>
           </div>
         </div>
