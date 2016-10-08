@@ -15,8 +15,8 @@ LightboxHandler.prototype.setUpEventListeners = function () {
   var $leftNav = this.$lightbox.getElementsByClassName('left')[0],
     $rightNav = this.$lightbox.getElementsByClassName('right')[0];
 
-  $leftNav.addEventListener('click', this.showPreviousPhoto);
-  $rightNav.addEventListener('click', this.showNextPhoto)
+  $leftNav.addEventListener('click', this.showPreviousPhoto.bind(this));
+  $rightNav.addEventListener('click', this.showNextPhoto.bind(this))
 
   document.addEventListener('keydown', triggerKeyDownAction.bind(this));
   document.addEventListener('click', triggerClose.bind(this));
@@ -40,10 +40,14 @@ LightboxHandler.prototype.setUpEventListeners = function () {
 
   function triggerClose(e) {
     var isKeydown = e.type === 'keydown';
+    var isClick = e.type === 'click';
     var escapeKeyPressed = isKeydown && e.keyCode === 27;
-    var outsideOfLightboxClicked = e.type === 'click' && e.target.getElementsByClassName('modal').length;
+    var outsideOfLightboxClicked = isClick && e.target.getElementsByClassName('modal').length;
+    var exitButtonClicked = isClick && e.target.classList.contains('exit');
 
-    if (escapeKeyPressed || outsideOfLightboxClicked) this.close();
+    if (escapeKeyPressed || outsideOfLightboxClicked || exitButtonClicked) {
+      this.close();
+    }
   }
 }
 
