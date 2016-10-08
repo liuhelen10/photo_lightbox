@@ -22,6 +22,8 @@ LightboxHandler.prototype.setUpEventListeners = function () {
   document.addEventListener('click', triggerClose.bind(this));
 
   function triggerKeyDownAction(e) {
+    if (!e) return;
+
     if (e.keyCode === 27) {
       // Escape key
       this.close();
@@ -130,16 +132,12 @@ function initializePage() {
     $searchInput.focus();
 
     $searchButton.addEventListener('click', searchForPhotos);
-    $searchInput.addEventListener('keydown', onSearchInputKeyDown);
+    $searchInput.addEventListener('keydown', triggerSearchForPhotos);
   }
 
-  function onSearchInputKeyDown(e) {
-    if (!e) return;
-
-    if (e.keyCode === 13) {
-      // Enter key
-      searchForPhotos();
-    }
+  function triggerSearchForPhotos(e) {
+    // Enter key
+    if (e && e.keyCode === 13) searchForPhotos();
   }
 
   function searchForPhotos() {
