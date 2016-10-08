@@ -143,12 +143,6 @@ function initializePage() {
   }
 
   function searchForPhotos() {
-    $photoGrid.innerHTML = [
-      '<p class="type-italic">',
-      'Loading...',
-      '</p>'
-    ].join('');
-
     var apiKey = '2a2a42163497badb56857f270528dd43',
         xhttp = new XMLHttpRequest(),
         apiUrl = 'https://api.flickr.com/services/rest/' +
@@ -157,9 +151,19 @@ function initializePage() {
           '&api_key=' + apiKey +
           '&text=' + $searchInput.value;
 
+    showPhotoGridMessage('Loading...');
+
     xhttp.onload = onSearchResultsLoaded;
     xhttp.open('GET', apiUrl, true);
     xhttp.send();
+  }
+
+  function showPhotoGridMessage(message) {
+    $photoGrid.innerHTML = [
+      '<p class="type-italic">',
+      message,
+      '</p>'
+    ].join('');
   }
 
   function onSearchResultsLoaded(e) {
@@ -167,7 +171,7 @@ function initializePage() {
       photosArray;
 
     if (response.stat !== 'ok') {
-      showErrorMessage();
+      showPhotoGridMessage('We\'re sorry, there was an error loading your photos');
       return;
     }
 
@@ -177,16 +181,13 @@ function initializePage() {
     photosArray = getFormattedPhotosResponse(response.photos.photo);
     lightboxHandler.setPhotosArray(photosArray);
 
-    for (var i = 0; i < photosArray.length; i++) {
-      appendPhotoToGrid(photosArray[i]);
+    if (!photosArray.length) {
+      showPhotoGridMessage('No results found');
+      return;
     }
 
-    function showErrorMessage() {
-      $photoGrid.innerHTML = [
-        '<p class="type-italic">',
-        'We\'re sorry, there was an error loading your photos.',
-        '</p>'
-      ].join('');
+    for (var i = 0; i < photosArray.length; i++) {
+      appendPhotoToGrid(photosArray[i]);
     }
 
     // Photo response handlers

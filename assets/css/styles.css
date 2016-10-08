@@ -11,21 +11,21 @@ body {
 
   -webkit-flex-flow: row wrap;
   flex-flow: row wrap;
+
+  justify-content: flex-start;
 }
 
 .image-thumbnail {
-  margin-right: 5px;
-  margin-bottom: 5px;
+  margin-right: 10px;
+  margin-bottom: 10px;
   background: gray;
+  min-width: 150px;
 
   display: -webkit-box;
   display: -moz-box;
   display: -ms-flexbox;
   display: -webkit-flex;
   display: flex;
-
-  flex: 1;
-  flex-basis: 150px;
 }
 
 #lightbox {
@@ -81,7 +81,6 @@ body {
   -webkit-flex-flow: row wrap;
   flex-flow: row wrap;
 
-  /*text-align: center;*/
   min-height: 300px;
 }
 
