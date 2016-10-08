@@ -3,6 +3,8 @@ function LightboxHandler(lightbox) {
   this.$lightbox = lightbox;
   this.$image = this.$lightbox.getElementsByClassName('lightbox-img')[0];
   this.$title = this.$lightbox.getElementsByClassName('lightbox-title')[0];
+  this.$chevronLeft = this.$lightbox.getElementsByClassName('chevron-left')[0];
+  this.$chevronRight = this.$lightbox.getElementsByClassName('chevron-right')[0];
   this.photosArray = [];
   this.currentPhotoIndex = -1;
 
@@ -55,7 +57,7 @@ LightboxHandler.prototype.setCurrentPhotoIndex = function (currentPhotoIndex) {
 
 LightboxHandler.prototype.open = function (currentPhotoIndex) {
   this.$lightbox.classList.remove('hide-fully');
-  this.currentPhotoIndex = currentPhotoIndex;
+  this.currentPhotoIndex = parseInt(currentPhotoIndex, 10);
   this.render();
 }
 
@@ -66,9 +68,27 @@ LightboxHandler.prototype.close = function () {
 }
 
 LightboxHandler.prototype.render = function () {
-  var photo = this.photosArray[this.currentPhotoIndex];
+  var photo = this.photosArray[this.currentPhotoIndex],
+    onLastPhoto = this.currentPhotoIndex === this.photosArray.length - 1,
+    onFirstPhoto = this.currentPhotoIndex === 0;
+
+  this.$image.src = '';
+  this.$image.alt = photo.title;
   this.$title.innerHTML = photo.title;
   this.$image.src = photo.full_url;
+
+  // Handle hiding/showing left and right arrows
+  if (onLastPhoto) {
+    this.$chevronRight.classList.add('hide-fully');
+  } else {
+    this.$chevronRight.classList.remove('hide-fully');
+  }
+
+  if (onFirstPhoto) {
+    this.$chevronLeft.classList.add('hide-fully');
+  } else {
+    this.$chevronLeft.classList.remove('hide-fully');
+  }
 }
 
 LightboxHandler.prototype.showPreviousPhoto = function() {
@@ -119,8 +139,11 @@ function initializePage() {
   }
 
   function searchForPhotos() {
-    // Clear photo grid
-    $photoGrid.innerHTML = '';
+    $photoGrid.innerHTML = [
+      '<p class="type-italic">',
+      'Loading...',
+      '</p>'
+    ].join('');
 
     var apiKey = '2a2a42163497badb56857f270528dd43',
         xhttp = new XMLHttpRequest(),
@@ -140,9 +163,12 @@ function initializePage() {
       photosArray;
 
     if (response.stat !== 'ok') {
-      // Handle error
+      showErrorMessage();
       return;
     }
+
+    // Clear photo grid
+    $photoGrid.innerHTML = '';
 
     photosArray = getFormattedPhotosResponse(response.photos.photo);
     lightboxHandler.setPhotosArray(photosArray);
@@ -151,13 +177,23 @@ function initializePage() {
       appendPhotoToGrid(photosArray[i]);
     }
 
+    function showErrorMessage() {
+      $photoGrid.innerHTML = [
+        '<p class="type-italic">',
+        'We\'re sorry, there was an error loading your photos.',
+        '</p>'
+      ].join('');
+    }
+
     // Photo response handlers
     function getFormattedPhotosResponse(photos) {
-      var photosResponse = [];
+      var photosResponse = [],
+        photo,
+        formattedPhoto;
 
       for (var i = 0; i < photos.length; i++) {
-        var photo = photos[i],
-          formattedPhoto = getFormattedPhoto(photo, i);
+        photo = photos[i];
+        formattedPhoto = getFormattedPhoto(photo, i);
 
         photosResponse.push(formattedPhoto);
       }
@@ -195,9 +231,8 @@ function initializePage() {
 
     $image.src = photo.thumbnail_url;
     $image.className = 'image-thumbnail clickable';
-    $image.setAttribute('data-full-url', photo.full_url);
+    $image.setAttribute('alt', photo.title);
     $image.setAttribute('data-index', photo.index);
-    $image.setAttribute('data-title', photo.title);
 
     $image.addEventListener('click', openLightbox)
 
