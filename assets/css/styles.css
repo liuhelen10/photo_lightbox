@@ -5,10 +5,8 @@
   display: -webkit-flex;
   display: flex;
 
-  -webkit-flex-flow: row wrap;
   flex-flow: row wrap;
-
-  justify-content: flex-start;
+  -webkit-flex-flow: row wrap;
 }
 
 .image-thumbnail {
@@ -82,30 +80,42 @@
 }
 
 .modal-content .header {
+  display: -webkit-flex;
+  display: flex;
+
   order: 1;
   flex: 100%;
 }
 
 .modal-content .left {
+  display: -webkit-flex;
+  display: flex;
+
   order: 2;
   flex: 1;
   align-items: center;
   justify-content: center;
-  display: flex;
 }
 
 .modal-content .middle {
+  display: -webkit-flex;
+  display: flex;
+
   order: 3;
   flex: 2;
   flex-basis: 300px;
+  align-items: center;
+  justify-content: center;
 }
 
 .modal-content .right {
+  display: -webkit-flex;
+  display: flex;
+
   order: 4;
   flex: 1;
   align-items: center;
   justify-content: center;
-  display: flex;
 }
 
 .exit {
@@ -128,18 +138,21 @@
 }
 
 #pagination .previous {
+  display: -webkit-flex;
   display: flex;
   flex: 1;
   justify-content: flex-start;
 }
 
 #pagination .page-number {
+  display: -webkit-flex;
   display: flex;
   flex: 1;
   justify-content: center;
 }
 
 #pagination .next {
+  display: -webkit-flex;
   display: flex;
   flex: 1;
   justify-content: flex-end;
