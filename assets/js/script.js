@@ -113,7 +113,7 @@ LightboxHandler.prototype.showNextPhoto = function() {
 
 
 
-
+// Pagination handler -- handles all logic concerning pagination
 function PaginationHandler(pagination, paginateCallback) {
   this.$pagination = pagination;
   this.$pageNumber = this.$pagination.getElementsByClassName('page-number')[0];
@@ -131,11 +131,12 @@ PaginationHandler.prototype.setUpEventListeners = function (paginateCallback) {
 
   this.$previous.addEventListener('click', function () {
     paginateCallback(this.currentPage - 1);
-  })
+  }.bind(this))
 }
 
 PaginationHandler.prototype.render = function (currentPage, totalPages) {
   this.currentPage = currentPage;
+  console.log(this.currentPage);
 
   this.$pageNumber.innerHTML = [
     'Page ',
@@ -157,6 +158,10 @@ PaginationHandler.prototype.render = function (currentPage, totalPages) {
   } else {
     this.$next.classList.add('hide-fully');
   }
+};
+
+PaginationHandler.prototype.hide = function () {
+  this.$pagination.classList.add('hide-fully');
 };
 
 
@@ -208,22 +213,20 @@ function initializePage() {
 
     var apiKey = '2a2a42163497badb56857f270528dd43',
         xhttp = new XMLHttpRequest(),
-        apiUrlComponents = [
+        apiUrl = [
           'https://api.flickr.com/services/rest/',
           '?method=flickr.photos.search',
           '&format=json&nojsoncallback=1&media=photos&per_page=104',
           '&api_key=', apiKey,
-          '&text=', $searchInput.value
-        ];
-
-    if (options && options.page) {
-      apiUrlComponents.push('&page=' + options.page)
-    }
+          '&text=', $searchInput.value,
+          '&page=', options.page || '1',
+        ].join('');
 
     showPhotoGridMessage('Loading...');
+    paginationHandler.hide();
 
     xhttp.onload = onSearchResultsLoaded;
-    xhttp.open('GET', apiUrlComponents.join(''), true);
+    xhttp.open('GET', apiUrl, true);
     xhttp.send();
   }
 
@@ -256,7 +259,6 @@ function initializePage() {
       renderPhotoGrid(photosArray, response.photos);
     }
 
-    // Photo response handlers
     function getFormattedPhotosResponse(photos) {
       var photosResponse = [],
         photo,
