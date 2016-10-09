@@ -4,17 +4,18 @@
   display: -ms-flexbox;
   display: -webkit-flex;
   display: flex;
+  -webkit-box-lines: multiple;
 
-  -webkit-flex-flow: row wrap;
   flex-flow: row wrap;
-
-  justify-content: flex-start;
+  -webkit-flex-flow: row wrap;
 }
 
 .image-thumbnail {
   margin-right: 10px;
   margin-bottom: 10px;
   background: gray;
+  /* Hides alt tag in firefox before image renders */
+  color: gray;
   min-width: 150px;
 
   display: -webkit-box;
@@ -22,7 +23,7 @@
   display: -ms-flexbox;
   display: -webkit-flex;
   display: flex;
-  flex: 1;
+  flex: 1 150px;
 }
 
 #lightbox {
@@ -51,8 +52,9 @@
 }
 
 .lightbox-img {
-  max-width: 600px;
-  max-height: 500px;
+  max-width: 100%;
+  height: auto;
+  width: 100%;
 }
 
 .lightbox-title {
@@ -82,30 +84,42 @@
 }
 
 .modal-content .header {
+  display: -webkit-flex;
+  display: flex;
+
   order: 1;
   flex: 100%;
 }
 
 .modal-content .left {
+  display: -webkit-flex;
+  display: flex;
+
   order: 2;
   flex: 1;
   align-items: center;
   justify-content: center;
-  display: flex;
 }
 
 .modal-content .middle {
+  display: -webkit-flex;
+  display: flex;
+
   order: 3;
   flex: 2;
   flex-basis: 300px;
+  align-items: center;
+  justify-content: center;
 }
 
 .modal-content .right {
+  display: -webkit-flex;
+  display: flex;
+
   order: 4;
   flex: 1;
   align-items: center;
   justify-content: center;
-  display: flex;
 }
 
 .exit {
@@ -128,25 +142,29 @@
 }
 
 #pagination .previous {
+  display: -webkit-flex;
   display: flex;
   flex: 1;
   justify-content: flex-start;
 }
 
 #pagination .page-number {
+  display: -webkit-flex;
   display: flex;
   flex: 1;
   justify-content: center;
+  text-align: center;
 }
 
 #pagination .next {
+  display: -webkit-flex;
   display: flex;
   flex: 1;
   justify-content: flex-end;
 }
 
 
-@media (max-width : 480px) {
+@media screen and (max-width: 768px) {
   h3 {
     font-size: 1em;
   }
