@@ -49,6 +49,12 @@
 
 
 
+
+/* Type */
 .type-italic {
   font-style: italic;
+}
+
+body {
+  font-family: "Helvetica";
 }
