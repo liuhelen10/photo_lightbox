@@ -181,11 +181,42 @@ function initializePage() {
 
     if (!photosArray.length) {
       showPhotoGridMessage('No results found');
-      return;
+    } else {
+      renderPhotoGrid(photosArray, response.photos);
     }
 
-    for (var i = 0; i < photosArray.length; i++) {
-      appendPhotoToGrid(photosArray[i]);
+    function renderPhotoGrid(photosArray, responseData) {
+      for (var i = 0; i < photosArray.length; i++) {
+        appendPhotoToGrid(photosArray[i]);
+      }
+
+      var $paginationDiv = document.getElementsByClassName('pagination')[0];
+      var $pageNumber = document.getElementsByClassName('page-number')[0];
+      var $previous = $paginationDiv.getElementsByClassName('previous')[0];
+      var $next = $paginationDiv.getElementsByClassName('next')[0];
+      var currentPage = responseData.page;
+      var totalPages = responseData.pages;
+
+      $pageNumber.innerHTML = [
+        'Page ',
+        currentPage,
+        ' of ',
+        totalPages
+      ].join('');
+
+      $paginationDiv.classList.remove('hide-fully');
+
+      if (currentPage > 1) {
+        $previous.classList.remove('hide-fully')
+      } else {
+        $previous.classList.add('hide-fully')
+      }
+
+      if (currentPage < totalPages) {
+        $next.classList.remove('hide-fully');
+      } else {
+        $next.classList.add('hide-fully');
+      }
     }
 
     // Photo response handlers
@@ -208,7 +239,7 @@ function initializePage() {
       var baseUrl = getPhotoBaseUrl(photo);
 
       return {
-        full_url: baseUrl + '.jpg',
+        full_url: baseUrl + '_c.jpg',
         thumbnail_url: baseUrl + '_q.jpg',
         title: photo.title,
         index: i

@@ -13,6 +13,10 @@
   padding-bottom: 50px;
 }
 
+.mrxs {
+  margin-right: 10px;
+}
+
 @media (max-width : 480px) {
   .xs-pas {
     padding: 15px 15px 15px 15px;
