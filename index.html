@@ -1,8 +1,10 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <link rel="stylesheet" type="text/css" href="assets/css/styleguide.css" />
+    <link rel="stylesheet" type="text/css" href="assets/css/common.css" />
     <link rel="stylesheet" type="text/css" href="assets/css/styles.css" />
+    <script src="assets/js/components/lightbox_handler.js"></script>
+    <script src="assets/js/components/pagination_handler.js"></script>
     <script src="assets/js/script.js"></script>
   </head>
 
@@ -15,12 +17,21 @@
       </div>
 
       <div id="photo-grid"></div>
+      <div id="pagination" class="mrxs pvm hide-fully">
+        <div class="previous hide-fully">
+          <a class="previous-page" href="#">Previous</a>
+        </div>
+        <div class="page-number">
+          <span>Page 1 of 100</span>
+        </div>
+        <div class="next hide-fully">
+          <a class="next-page" href="#">Next</a>
+        </div>
+      </div>
 
     <div id="lightbox" class="hide-fully">
       <div class="background"></div>
-      <!-- <div class="exit"> -->
       <img src="assets/symbols/exit.png" class="exit clickable"/>
-      <!-- </div> -->
       <div class="content">
         <div class="modal">
           <div class="header">
