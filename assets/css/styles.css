@@ -120,7 +120,7 @@ body {
   height: 40px;
 }
 
-.pagination {
+#pagination {
   display: -webkit-box;
   display: -moz-box;
   display: -ms-flexbox;
@@ -131,19 +131,19 @@ body {
   flex-flow: row;
 }
 
-.pagination .previous {
+#pagination .previous {
   display: flex;
   flex: 1;
   justify-content: flex-start;
 }
 
-.pagination .page-number {
+#pagination .page-number {
   display: flex;
   flex: 1;
   justify-content: center;
 }
 
-.pagination .next {
+#pagination .next {
   display: flex;
   flex: 1;
   justify-content: flex-end;

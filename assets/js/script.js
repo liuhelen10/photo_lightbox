@@ -113,46 +113,71 @@ LightboxHandler.prototype.showNextPhoto = function() {
 
 
 
+
 // Page logic
 function initializePage() {
   var $searchInput = null,
     $photoGrid = null,
+    $pagination = null,
+    currentPage = -1,
     lightboxHandler;
 
   document.addEventListener('DOMContentLoaded', onDOMLoad);
 
   function onDOMLoad() {
-    var $searchButton = document.getElementById('search-btn');
-
     // Globals
     lightboxHandler = new LightboxHandler(document.getElementById('lightbox'));
     $searchInput = document.getElementById('search-input');
     $photoGrid = document.getElementById('photo-grid');
+    $pagination = document.getElementById('pagination');
+
+    var $searchButton = document.getElementById('search-btn');
+    var $nextPage = $pagination.getElementsByClassName('next-page')[0];
+    var $previousPage = $pagination.getElementsByClassName('previous-page')[0];
 
     $searchInput.focus();
 
     $searchButton.addEventListener('click', searchForPhotos);
     $searchInput.addEventListener('keydown', triggerSearchForPhotos);
+    $nextPage.addEventListener('click', triggerSearchForPhotos);
+    $previousPage.addEventListener('click', triggerSearchForPhotos);
   }
 
   function triggerSearchForPhotos(e) {
+    if (!e) return;
     // Enter key
-    if (e && e.keyCode === 13) searchForPhotos();
+    if (e.type === 'keydown' && e.keyCode === 13) {
+      searchForPhotos();
+    } else {
+      if (e.target.classList.contains('next-page')) {
+        searchForPhotos({ page: currentPage + 1 });
+      } else if (e.target.classList.contains('previous-page')) {
+        searchForPhotos({ page: currentPage - 1 });
+      }
+    }
   }
 
-  function searchForPhotos() {
+  function searchForPhotos(options) {
+    options = options || {};
+
     var apiKey = '2a2a42163497badb56857f270528dd43',
         xhttp = new XMLHttpRequest(),
-        apiUrl = 'https://api.flickr.com/services/rest/' +
-          '?method=flickr.photos.search' +
-          '&format=json&nojsoncallback=1&media=photos&per_page=104' +
-          '&api_key=' + apiKey +
-          '&text=' + $searchInput.value;
+        apiUrlComponents = [
+          'https://api.flickr.com/services/rest/',
+          '?method=flickr.photos.search',
+          '&format=json&nojsoncallback=1&media=photos&per_page=104',
+          '&api_key=', apiKey,
+          '&text=', $searchInput.value
+        ];
+
+    if (options && options.page) {
+      apiUrlComponents.push('&page=' + options.page)
+    }
 
     showPhotoGridMessage('Loading...');
 
     xhttp.onload = onSearchResultsLoaded;
-    xhttp.open('GET', apiUrl, true);
+    xhttp.open('GET', apiUrlComponents.join(''), true);
     xhttp.send();
   }
 
@@ -190,11 +215,11 @@ function initializePage() {
         appendPhotoToGrid(photosArray[i]);
       }
 
-      var $paginationDiv = document.getElementsByClassName('pagination')[0];
-      var $pageNumber = document.getElementsByClassName('page-number')[0];
+      var $paginationDiv = document.getElementById('pagination');
+      var $pageNumber = $paginationDiv.getElementsByClassName('page-number')[0];
       var $previous = $paginationDiv.getElementsByClassName('previous')[0];
       var $next = $paginationDiv.getElementsByClassName('next')[0];
-      var currentPage = responseData.page;
+      currentPage = responseData.page;
       var totalPages = responseData.pages;
 
       $pageNumber.innerHTML = [
