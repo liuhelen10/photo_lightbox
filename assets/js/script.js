@@ -9,7 +9,7 @@ function LightboxHandler(lightbox) {
   this.currentPhotoIndex = -1;
 
   this.setUpEventListeners();
-}
+};
 
 LightboxHandler.prototype.setUpEventListeners = function () {
   var $leftNav = this.$lightbox.getElementsByClassName('left')[0],
@@ -51,27 +51,27 @@ LightboxHandler.prototype.setUpEventListeners = function () {
       this.close();
     }
   }
-}
+};
 
 LightboxHandler.prototype.setPhotosArray = function (photosArray) {
   this.photosArray = photosArray;
-}
+};
 
 LightboxHandler.prototype.setCurrentPhotoIndex = function (currentPhotoIndex) {
   this.currentPhotoIndex = currentPhotoIndex;
-}
+};
 
 LightboxHandler.prototype.open = function (currentPhotoIndex) {
   this.$lightbox.classList.remove('hide-fully');
   this.currentPhotoIndex = parseInt(currentPhotoIndex, 10);
   this.render();
-}
+};
 
 LightboxHandler.prototype.close = function () {
   this.$lightbox.classList.add('hide-fully');
   this.$image.src = '';
   this.$title.innerHTML = '';
-}
+};
 
 LightboxHandler.prototype.render = function () {
   var photo = this.photosArray[this.currentPhotoIndex],
@@ -95,21 +95,70 @@ LightboxHandler.prototype.render = function () {
   } else {
     this.$chevronLeft.classList.remove('hide-fully');
   }
-}
+};
 
 LightboxHandler.prototype.showPreviousPhoto = function() {
   if (this.currentPhotoIndex > 0) {
     this.currentPhotoIndex--;
     this.render(this.photosArray[this.currentPhotoIndex]);
   }
-}
+};
 
 LightboxHandler.prototype.showNextPhoto = function() {
   if (this.currentPhotoIndex < this.photosArray.length - 1) {
     this.currentPhotoIndex++;
     this.render(this.photosArray[this.currentPhotoIndex]);
   }
+};
+
+
+
+
+function PaginationHandler(pagination, paginateCallback) {
+  this.$pagination = pagination;
+  this.$pageNumber = this.$pagination.getElementsByClassName('page-number')[0];
+  this.$previous = this.$pagination.getElementsByClassName('previous')[0];
+  this.$next = this.$pagination.getElementsByClassName('next')[0];
+  this.currentPage = -1;
+
+  this.setUpEventListeners(paginateCallback);
 }
+
+PaginationHandler.prototype.setUpEventListeners = function (paginateCallback) {
+  this.$next.addEventListener('click', function () {
+    paginateCallback(this.currentPage + 1);
+  }.bind(this));
+
+  this.$previous.addEventListener('click', function () {
+    paginateCallback(this.currentPage - 1);
+  })
+}
+
+PaginationHandler.prototype.render = function (currentPage, totalPages) {
+  this.currentPage = currentPage;
+
+  this.$pageNumber.innerHTML = [
+    'Page ',
+    currentPage,
+    ' of ',
+    totalPages
+  ].join('');
+
+  this.$pagination.classList.remove('hide-fully');
+
+  if (currentPage > 1) {
+    this.$previous.classList.remove('hide-fully')
+  } else {
+    this.$previous.classList.add('hide-fully')
+  }
+
+  if (currentPage < totalPages) {
+    this.$next.classList.remove('hide-fully');
+  } else {
+    this.$next.classList.add('hide-fully');
+  }
+};
+
 
 
 
@@ -120,40 +169,37 @@ function initializePage() {
     $photoGrid = null,
     $pagination = null,
     currentPage = -1,
-    lightboxHandler;
+    lightboxHandler,
+    paginationHandler;
 
   document.addEventListener('DOMContentLoaded', onDOMLoad);
 
   function onDOMLoad() {
     // Globals
     lightboxHandler = new LightboxHandler(document.getElementById('lightbox'));
+    paginationHandler = new PaginationHandler(
+      document.getElementById('pagination'),
+      triggerSearchNextOrPreviousPage
+    );
     $searchInput = document.getElementById('search-input');
     $photoGrid = document.getElementById('photo-grid');
-    $pagination = document.getElementById('pagination');
 
     var $searchButton = document.getElementById('search-btn');
-    var $nextPage = $pagination.getElementsByClassName('next-page')[0];
-    var $previousPage = $pagination.getElementsByClassName('previous-page')[0];
 
     $searchInput.focus();
 
     $searchButton.addEventListener('click', searchForPhotos);
     $searchInput.addEventListener('keydown', triggerSearchForPhotos);
-    $nextPage.addEventListener('click', triggerSearchForPhotos);
-    $previousPage.addEventListener('click', triggerSearchForPhotos);
+  }
+
+  function triggerSearchNextOrPreviousPage(page) {
+    searchForPhotos({ page: page });
   }
 
   function triggerSearchForPhotos(e) {
-    if (!e) return;
     // Enter key
-    if (e.type === 'keydown' && e.keyCode === 13) {
+    if (e && e.type === 'keydown' && e.keyCode === 13) {
       searchForPhotos();
-    } else {
-      if (e.target.classList.contains('next-page')) {
-        searchForPhotos({ page: currentPage + 1 });
-      } else if (e.target.classList.contains('previous-page')) {
-        searchForPhotos({ page: currentPage - 1 });
-      }
     }
   }
 
@@ -210,40 +256,6 @@ function initializePage() {
       renderPhotoGrid(photosArray, response.photos);
     }
 
-    function renderPhotoGrid(photosArray, responseData) {
-      for (var i = 0; i < photosArray.length; i++) {
-        appendPhotoToGrid(photosArray[i]);
-      }
-
-      var $paginationDiv = document.getElementById('pagination');
-      var $pageNumber = $paginationDiv.getElementsByClassName('page-number')[0];
-      var $previous = $paginationDiv.getElementsByClassName('previous')[0];
-      var $next = $paginationDiv.getElementsByClassName('next')[0];
-      currentPage = responseData.page;
-      var totalPages = responseData.pages;
-
-      $pageNumber.innerHTML = [
-        'Page ',
-        currentPage,
-        ' of ',
-        totalPages
-      ].join('');
-
-      $paginationDiv.classList.remove('hide-fully');
-
-      if (currentPage > 1) {
-        $previous.classList.remove('hide-fully')
-      } else {
-        $previous.classList.add('hide-fully')
-      }
-
-      if (currentPage < totalPages) {
-        $next.classList.remove('hide-fully');
-      } else {
-        $next.classList.add('hide-fully');
-      }
-    }
-
     // Photo response handlers
     function getFormattedPhotosResponse(photos) {
       var photosResponse = [],
@@ -283,6 +295,14 @@ function initializePage() {
         photo.secret
       ].join('');
     }
+  }
+
+  function renderPhotoGrid(photosArray, responseData) {
+    for (var i = 0; i < photosArray.length; i++) {
+      appendPhotoToGrid(photosArray[i]);
+    }
+
+    paginationHandler.render(responseData.page, responseData.pages);
   }
 
   function appendPhotoToGrid(photo) {
