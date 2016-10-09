@@ -2,8 +2,6 @@
 function initializePage() {
   var $searchInput = null,
     $photoGrid = null,
-    $pagination = null,
-    currentPage = -1,
     lightboxHandler,
     paginationHandler;
 
